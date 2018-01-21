@@ -1,0 +1,36 @@
+BEGIN{
+	data_len = 0
+	re_num = 1
+	pre_value = 0
+	new_data_count=1
+}
+{
+	data[NR] = $0
+ #	printf("NR=%d, data=%s\n", NR, data[NR-1])
+}
+{
+}
+END {
+	data_len = asort(data, data_sort)
+#	for(i=1; i <= data_len; i++)
+#	    printf("data_sort[%d] = %s\n", i, data_sort[i]);
+
+
+
+	for(i=1; i <= data_len; i++) {
+		if (pre_value != data_sort[i]) {
+			new_data[new_data_count] = data_sort[i]
+			pre_value = data_sort[i]
+			new_data_count_re[new_data_count] = 1
+			new_data_count++
+			re_num = 1
+		} else {
+			re_num++
+			new_data_count_re[new_data_count - 1] = re_num
+		}
+	}
+
+	for (i=1; i < new_data_count; i++) {
+		printf("%s\t %d\n", new_data[i], new_data_count_re[i]) | "sort -r -h -k1"
+	}
+}
