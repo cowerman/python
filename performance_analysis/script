@@ -1,0 +1,11 @@
+cat ./logs | grep "CWPGT Pattern test: update WP for gfn" > logs_data
+gawk '{print $NF}' logs_data > data_txt
+gawk -f para_data data_txt
+#BEGIN{
+#data_count = 0
+#pre_data = 0
+#}
+#{
+#    data[NR] = $0
+#}
+#for data in `cat data_txt` 
