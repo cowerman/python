@@ -37,7 +37,7 @@ mem_seq_write_list = []
 # skip first two data for eache log file by default
 skip = 2
 
-for i in range(5):
+for i in range(6):
     # differentt type log file
     i += 1
     if i == 1:
@@ -45,7 +45,7 @@ for i in range(5):
         log_prefix = cpu_prefix
     if i == 2:
         file_num   = gpu_num
-        log_perfix = gpu_prefix
+        log_prefix = gpu_prefix
     if i == 3:
         file_num   = mem_rnd_read_num
         log_prefix = rnd_read_prefix
@@ -61,12 +61,13 @@ for i in range(5):
 
     # the number for the same type file
     for log_i in range(int(file_num[1])):
-        log_file =  log_prefix + str(log_i+1)
+        log_file = log_prefix + str(log_i+1)
 
     # anl the specify the log file
         index = 1
         for row in open(log_file, 'r'):
-            if len(row) < 3:
+            # measure the row length, need to split first
+            if len(row.split()) < 3:
                 continue
             # cpu perfermence
             if i == 1:
@@ -74,7 +75,8 @@ for i in range(5):
                     if index < skip:
                         index += 1
                         continue
-                    cpu_list.insert(index, row.split()[2])
+                    cpu_perf = row.split()[2].rstrip('s')
+                    cpu_list.insert(index, cpu_perf)
             if i == 2:
                 if row.split()[1] == "Score:":
                     if index < skip:
@@ -107,22 +109,47 @@ for i in range(5):
                     if index < skip:
                         index += 1
                         continue
-                    seq_write = row.split()[3].lstrip('(').rstrip('(')
-                    mem_seq_write_list.insert(index, row.split()[3])
+                    seq_write = row.split()[3].lstrip('(').rstrip(')')
+                    mem_seq_write_list.insert(index, seq_write)
             index += 1
 
 # sort the list
+cpu_list.sort()
+gpu_list.sort()
+mem_rnd_read_list.sort()
+mem_seq_read_list.sort()
+mem_rnd_write_list.sort()
+mem_seq_write_list.sort()
 
 # abandon the lowest and the highest value
+cpu_list.pop()
+cpu_list.pop(0)
+gpu_list.pop()
+gpu_list.pop(0)
+mem_rnd_read_list.pop()
+mem_rnd_read_list.pop(0)
+mem_seq_read_list.pop()
+mem_seq_read_list.pop(0)
+mem_rnd_write_list.pop()
+mem_rnd_write_list.pop(0)
+mem_seq_write_list.pop()
+mem_seq_write_list.pop(0)
 
-print cpu_list
-print gpu_list
+"""
+# output to debug option
+print "CPU: "+str(cpu_list)
+print "CPU: "+str(cpu_list)
+print "GPU: "+str(gpu_list)
+print "rnd_read: "+str(mem_rnd_read_list)
+print "seq_read: "+str(mem_seq_read_list)
+print "rnd_write: "+str(mem_rnd_write_list)
+print "seq_write: "+str(mem_seq_write_list)
 """
 # cal the averager values
 cpu_avg = sum(float(y) for y in cpu_list) / len(cpu_list)
 gpu_avg = sum(float(y) for y in gpu_list) / len(gpu_list)
-mem_rnd_read_avg = sum(float(y) for y in mem_rnd_read_list) / len(mem_rnd_read_list)
-mem_seq_read_avg = sum(float(y) for y in mem_seq_read_list) / len(mem_seq_read_list)
+mem_rnd_read_avg  = sum(float(y) for y in mem_rnd_read_list)  / len(mem_rnd_read_list)
+mem_seq_read_avg  = sum(float(y) for y in mem_seq_read_list)  / len(mem_seq_read_list)
 mem_rnd_write_avg = sum(float(y) for y in mem_rnd_write_list) / len(mem_rnd_write_list)
 mem_seq_write_avg = sum(float(y) for y in mem_seq_write_list) / len(mem_seq_write_list)
 
@@ -130,8 +157,6 @@ mem_seq_write_avg = sum(float(y) for y in mem_seq_write_list) / len(mem_seq_writ
 print "CPU take time(s):                  "+str(cpu_avg)
 print "GPU Score(fps):                    "+str(gpu_avg)
 print "MEM random read  speed(MB/S):      "+str(mem_rnd_read_avg)
-print "MEM random write speed(MB/S):      "+str(mem_rnd_read_avg)
-print "MEM sequential read  speed(MB/S):  "+str(mem_rnd_read_avg)
-print "MEM sequential write speed(MB/S):  "+str(mem_rnd_read_avg)
-"""
-
+print "MEM random write speed(MB/S):      "+str(mem_seq_read_avg)
+print "MEM sequential read  speed(MB/S):  "+str(mem_rnd_write_avg)
+print "MEM sequential write speed(MB/S):  "+str(mem_seq_write_avg)
