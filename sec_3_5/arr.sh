@@ -30,3 +30,7 @@ done
 good_man w x y
 echo $1 $2 $3
 
+ac=(`df -lh`)
+echo ${ac[*]}
+echo ${ac[0]}
+echo ${ac[10]}

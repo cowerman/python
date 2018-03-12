@@ -7,6 +7,9 @@ print "%c" % (97)
 print "%c" % 98
 print "%-10d" % 68
 print "%10d"  % 69
+print "%10s" % "i love"
+print "%-10s" % "n love"
+
 
 print "%010d" % 67
 print "%2f" % 78.96
