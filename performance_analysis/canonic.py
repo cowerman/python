@@ -3,6 +3,7 @@
 import sys
 import os
 import collections
+from collections import OrderedDict
 
 def usage():
     # print the usage of this python    
@@ -10,7 +11,7 @@ def usage():
     print "python "+ sys.argv[0] + " datafile steps"
     return
 
-if len(sys.argv) < 2 or not os.path.isfile(sys.argv[1]):
+if len(sys.argv) < 3:
     usage()
     sys.exit()
 
@@ -18,47 +19,63 @@ log_file=sys.argv[1]
 
 index = 0
 int_word = []
-for line in open(log_file, 'r'):
-        int_word_data = line.split()[-1]
+
+fd = open(log_file, 'r')
+for line in fd:
+        int_word_data = int(line.split()[-1])
         int_word.insert(index, int_word_data)
         index = index + 1
         #int_word.insert(index, int(hex_word, 16))
         #index = index + 1
+fd.close()
 
-global_data = collections.Counter(int_word)
-sort_data = global_data.items()
+sort_data = collections.Counter(int_word).items()
 sort_data.sort()
 
-g_key = list(global_data)
+g_key = list(collections.Counter(int_word))
 g_key.sort()
+
+#free int_word
+int_word = []
+
 # output fromat for excel
 #for key,value in sort_data:
 #        print (str(key)+"\t"+str(value))
 
-if len(sys.argv) < 3:
-    usage()
-    sys.exit()
-
 # canonical distribution
 length = len(sort_data)
 step = sys.argv[2]
-step_value = (int(g_key[-1]) - int(g_key[0])) // int(step)
-print "The step is: "+str(sys.argv[2])+" The step value is: "+str(step_value)
+step_value = (int(g_key[-1]) - int(g_key[0])) / int(step)
+#print "The step is: "+str(sys.argv[2])+" The step value is: "+str(step_value)
 new_data = {}
-index = 1
 per_value = 0
 per_data = 0
 
-print sort_data
+per_data = int(g_key[0]) + step_value
+#free g_key
+g_key = []
+
 for key,value in sort_data:
-    per_data = int(g_key[0]) + step_value * index
-    print per_data
-    #if int(key) < per_data or (per_data > int(g_key[-1] and int(key) < int(g_key[-1]))):
-    if int(key) <= per_data:
+    #print "key: " + str(key) + "    value: " + str(value) + "    per_data: " + str(per_data) + "    per_value: " + str(per_value)
+    if int(key) < per_data:
         per_value += value
     else:
         new_data[per_data] = per_value
         per_value = 0
-        index += 1
+        per_data += step_value
 
-print new_data
+        while True:
+            if int(key) < per_data:
+                per_value += value
+                break
+            else :
+                new_data[per_data] = per_value
+                per_data += step_value
+                continue
+
+new_data[per_data] = per_value
+
+items = new_data.items()
+items.sort()
+for k, v in items:
+    print str(k)+","+str(v)
