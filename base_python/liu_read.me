@@ -1,0 +1,21 @@
+
+sample.py
+
+1.Generating content using mixer.. 
+ mixer.sh----  dm-verity
+2.Generating dm-verity root_hash..
+ dm-verity.sh disk_image data_partition hash_partition
+3.Creating initramfs..
+     Makefile
+	initramfs.sh clr-init-dm-verity.cpio.gz -> generate initramfs -> cp init initramfs/
+
+4.Copying initramfs to boot partition..
+
+5.Updating bootloader config..
+  configure cmd line for bootargs
+
+6.Adding the cmd in to boot.cmd
+
+start_qemu.sh release.img 
+
+
